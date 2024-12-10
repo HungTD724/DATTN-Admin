@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import React, { useState } from 'react';
 import RouterLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import Box from '@mui/material/Box';
@@ -107,7 +107,7 @@ export function SideNav(): React.JSX.Element {
           target="_blank"
           variant="contained"
         >
-          Pro version
+          Trần Đại Hùng
         </Button>
       </Stack>
     </Box>
@@ -135,8 +135,22 @@ interface NavItemProps extends Omit<NavItemConfig, 'items'> {
 }
 
 function NavItem({ disabled, external, href, icon, matcher, pathname, title }: NavItemProps): React.JSX.Element {
+  const [loading, setLoading] = useState(false);
   const active = isNavItemActive({ disabled, external, href, matcher, pathname });
   const Icon = icon ? navIcons[icon] : null;
+
+  const handleClick = async (event: React.MouseEvent) => {
+    if (disabled || !href || external) return;
+
+    setLoading(true);
+
+    try {
+      // Simulate navigation delay
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <li>
@@ -147,8 +161,9 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
               href,
               target: external ? '_blank' : undefined,
               rel: external ? 'noreferrer' : undefined,
+              onClick: handleClick,
             }
-          : { role: 'button' })}
+          : { role: 'button', onClick: handleClick })}
         sx={{
           alignItems: 'center',
           borderRadius: 1,
@@ -172,9 +187,16 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
         <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
           {Icon ? (
             <Icon
-              fill={active ? 'var(--NavItem-icon-active-color)' : 'var(--NavItem-icon-color)'}
+              fill={
+                loading
+                  ? 'var(--mui-palette-primary-main)'
+                  : active
+                    ? 'var(--NavItem-icon-active-color)'
+                    : 'var(--NavItem-icon-color)'
+              }
               fontSize="var(--icon-fontSize-md)"
               weight={active ? 'fill' : undefined}
+              className={loading ? 'spin-icon' : ''}
             />
           ) : null}
         </Box>

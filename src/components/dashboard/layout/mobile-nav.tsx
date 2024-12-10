@@ -114,7 +114,7 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
           target="_blank"
           variant="contained"
         >
-          Pro version
+          Trần Đại Hùng
         </Button>
       </Stack>
     </Drawer>

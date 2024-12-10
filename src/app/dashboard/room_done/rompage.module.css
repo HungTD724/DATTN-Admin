@@ -1,0 +1,99 @@
+/* General styles for the container and table */
+.container {
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  color: #4c51bf;
+  margin-bottom: 1.5rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.table th {
+  background-color: #edf2f7;
+}
+
+.status-available {
+  color: green;
+}
+
+.status-unavailable {
+  color: red;
+}
+
+/* Button styles */
+.button {
+  background-color: #3182ce;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #2b6cb0;
+}
+
+.details {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #f7fafc;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.bid-history {
+  margin-top: 15px;
+}
+
+.bid-history-title {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.bid-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bid-item {
+  padding: 10px;
+  background-color: #e2e8f0;
+  border-radius: 4px;
+}
+
+.bid-item p {
+  margin: 0;
+}
+
+.statusAvailable {
+  color: rgb(158, 47, 80);
+}
+
+.winner {
+  background-color: #cacaca; /* Màu vàng nổi bật */
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 5px;
+}

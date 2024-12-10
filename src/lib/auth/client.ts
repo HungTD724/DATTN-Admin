@@ -1,5 +1,8 @@
 'use client';
 
+import fetchApi from '@/utils/api';
+import Cookies from 'js-cookie';
+
 import type { User } from '@/types/user';
 
 function generateToken(): string {
@@ -47,24 +50,31 @@ class AuthClient {
     return {};
   }
 
-  async signInWithOAuth(_: SignInWithOAuthParams): Promise<{ error?: string }> {
-    return { error: 'Social authentication not implemented' };
-  }
-
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
     const { email, password } = params;
 
-    // Make API request
+    try {
+      // Make the API request
+      const response = await fetchApi('/auth/login', 'POST', { email, password });
 
-    // We do not handle the API, so we'll check if the credentials match with the hardcoded ones.
-    if (email !== 'sofia@devias.io' || password !== 'Secret1') {
-      return { error: 'Invalid credentials' };
+      // Check if the response status is not 200
+      if (response.status !== 200) {
+        return {
+          error: 'Invalid credentials',
+        };
+      }
+
+      // If the response is successful, set the cookies
+      Cookies.set('fullName', email, { expires: 7 }); // Expires in 7 days
+      Cookies.set('userId', response.metadata.user._id, { expires: 7 });
+      Cookies.set('token', response.metadata.tokens.accessToken, { expires: 7 });
+      localStorage.setItem('custom-auth-token', response.metadata.tokens.accessToken);
+
+      return {};
+    } catch (error) {
+      console.error('Error during sign-in:', error);
+      return { error: 'An error occurred while signing in' };
     }
-
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
-
-    return {};
   }
 
   async resetPassword(_: ResetPasswordParams): Promise<{ error?: string }> {

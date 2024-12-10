@@ -1,119 +1,70 @@
+'use client';
+
 import * as React from 'react';
-import type { Metadata } from 'next';
+import fetchApi from '@/utils/api';
 import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import InputAdornment from '@mui/material/InputAdornment';
+import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
+import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import dayjs from 'dayjs';
+import Cookies from 'js-cookie';
 
-import { config } from '@/config';
-import { CustomersFilters } from '@/components/dashboard/customer/customers-filters';
 import { CustomersTable } from '@/components/dashboard/customer/customers-table';
 import type { Customer } from '@/components/dashboard/customer/customers-table';
 
-export const metadata = { title: `Customers | Dashboard | ${config.site.name}` } satisfies Metadata;
-
-const customers = [
-  {
-    id: 'USR-010',
-    name: 'Alcides Antonio',
-    avatar: '/assets/avatar-10.png',
-    email: 'alcides.antonio@devias.io',
-    phone: '908-691-3242',
-    address: { city: 'Madrid', country: 'Spain', state: 'Comunidad de Madrid', street: '4158 Hedge Street' },
-    createdAt: dayjs().subtract(2, 'hours').toDate(),
-  },
-  {
-    id: 'USR-009',
-    name: 'Marcus Finn',
-    avatar: '/assets/avatar-9.png',
-    email: 'marcus.finn@devias.io',
-    phone: '415-907-2647',
-    address: { city: 'Carson City', country: 'USA', state: 'Nevada', street: '2188 Armbrester Drive' },
-    createdAt: dayjs().subtract(2, 'hours').toDate(),
-  },
-  {
-    id: 'USR-008',
-    name: 'Jie Yan',
-    avatar: '/assets/avatar-8.png',
-    email: 'jie.yan.song@devias.io',
-    phone: '770-635-2682',
-    address: { city: 'North Canton', country: 'USA', state: 'Ohio', street: '4894 Lakeland Park Drive' },
-    createdAt: dayjs().subtract(2, 'hours').toDate(),
-  },
-  {
-    id: 'USR-007',
-    name: 'Nasimiyu Danai',
-    avatar: '/assets/avatar-7.png',
-    email: 'nasimiyu.danai@devias.io',
-    phone: '801-301-7894',
-    address: { city: 'Salt Lake City', country: 'USA', state: 'Utah', street: '368 Lamberts Branch Road' },
-    createdAt: dayjs().subtract(2, 'hours').toDate(),
-  },
-  {
-    id: 'USR-006',
-    name: 'Iulia Albu',
-    avatar: '/assets/avatar-6.png',
-    email: 'iulia.albu@devias.io',
-    phone: '313-812-8947',
-    address: { city: 'Murray', country: 'USA', state: 'Utah', street: '3934 Wildrose Lane' },
-    createdAt: dayjs().subtract(2, 'hours').toDate(),
-  },
-  {
-    id: 'USR-005',
-    name: 'Fran Perez',
-    avatar: '/assets/avatar-5.png',
-    email: 'fran.perez@devias.io',
-    phone: '712-351-5711',
-    address: { city: 'Atlanta', country: 'USA', state: 'Georgia', street: '1865 Pleasant Hill Road' },
-    createdAt: dayjs().subtract(2, 'hours').toDate(),
-  },
-
-  {
-    id: 'USR-004',
-    name: 'Penjani Inyene',
-    avatar: '/assets/avatar-4.png',
-    email: 'penjani.inyene@devias.io',
-    phone: '858-602-3409',
-    address: { city: 'Berkeley', country: 'USA', state: 'California', street: '317 Angus Road' },
-    createdAt: dayjs().subtract(2, 'hours').toDate(),
-  },
-  {
-    id: 'USR-003',
-    name: 'Carson Darrin',
-    avatar: '/assets/avatar-3.png',
-    email: 'carson.darrin@devias.io',
-    phone: '304-428-3097',
-    address: { city: 'Cleveland', country: 'USA', state: 'Ohio', street: '2849 Fulton Street' },
-    createdAt: dayjs().subtract(2, 'hours').toDate(),
-  },
-  {
-    id: 'USR-002',
-    name: 'Siegbert Gottfried',
-    avatar: '/assets/avatar-2.png',
-    email: 'siegbert.gottfried@devias.io',
-    phone: '702-661-1654',
-    address: { city: 'Los Angeles', country: 'USA', state: 'California', street: '1798 Hickory Ridge Drive' },
-    createdAt: dayjs().subtract(2, 'hours').toDate(),
-  },
-  {
-    id: 'USR-001',
-    name: 'Miron Vitold',
-    avatar: '/assets/avatar-1.png',
-    email: 'miron.vitold@devias.io',
-    phone: '972-333-4106',
-    address: { city: 'San Diego', country: 'USA', state: 'California', street: '75247' },
-    createdAt: dayjs().subtract(2, 'hours').toDate(),
-  },
-] satisfies Customer[];
-
 export default function Page(): React.JSX.Element {
-  const page = 0;
+  const [originalData, setOriginalData] = React.useState<Customer[]>([]);
+  const [userData, setUserData] = React.useState<Customer[]>([]);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [page, setPage] = React.useState(0);
   const rowsPerPage = 5;
 
-  const paginatedCustomers = applyPagination(customers, page, rowsPerPage);
+  const fetchUser = async () => {
+    try {
+      const userId = Cookies.get('userId');
+
+      if (!userId) {
+        console.error('User ID is missing from cookies');
+        return;
+      }
+
+      const response = await fetchApi(`/auth/getAllUser/${userId}`, 'GET');
+      console.log('Admin user:', response.metadata);
+      const data = response.metadata || [];
+      setOriginalData(data); // Lưu dữ liệu gốc
+      setUserData(data); // Hiển thị dữ liệu ban đầu
+    } catch (error) {
+      console.error('There was a problem with the fetch operation:', error);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchUser();
+  }, []);
+
+  // Lọc danh sách khách hàng dựa trên từ khóa tìm kiếm
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      if (!searchTerm.trim()) {
+        // Nếu từ khóa tìm kiếm trống, khôi phục dữ liệu gốc
+        setUserData(originalData);
+      } else {
+        // Lọc dữ liệu dựa trên từ khóa tìm kiếm
+        const newFilteredCustomers = originalData.filter((customer) =>
+          customer.fullName?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        setUserData(newFilteredCustomers);
+      }
+    }
+  };
+
+  const paginatedCustomers = applyPagination(userData, page, rowsPerPage);
 
   return (
     <Stack spacing={3}>
@@ -135,12 +86,27 @@ export default function Page(): React.JSX.Element {
           </Button>
         </div>
       </Stack>
-      <CustomersFilters />
+      <Card sx={{ p: 2 }}>
+        <OutlinedInput
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={handleSearch}
+          fullWidth
+          placeholder="Search customer"
+          startAdornment={
+            <InputAdornment position="start">
+              <MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />
+            </InputAdornment>
+          }
+          sx={{ maxWidth: '500px' }}
+        />
+      </Card>
       <CustomersTable
-        count={paginatedCustomers.length}
+        count={userData.length}
         page={page}
-        rows={paginatedCustomers}
+        initialRows={paginatedCustomers}
         rowsPerPage={rowsPerPage}
+        onChangePage={(newPage) => setPage(newPage)}
       />
     </Stack>
   );
