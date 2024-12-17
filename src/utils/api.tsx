@@ -1,17 +1,17 @@
 // utils/api.ts
-import Cookies from "js-cookie";
+import Cookies from 'js-cookie';
 
-const API_BASE_URL = "http://localhost:3001/v1/api"; // Thay đổi URL cơ sở của bạn
+const API_BASE_URL = 'http://localhost:3001/v1/api'; // Thay đổi URL cơ sở của bạn
 
-const fetchApi = async (endpoint: string, method: string = "GET", body: any = null) => {
-  const token = Cookies.get("token"); // Lấy token từ cookie
+const fetchApi = async (endpoint: string, method: string = 'GET', body: any = null) => {
+  const token = Cookies.get('token'); // Lấy token từ cookie
   const headers: HeadersInit = {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   };
 
   // Thêm token vào headers nếu có
   if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {

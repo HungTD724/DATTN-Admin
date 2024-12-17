@@ -8,6 +8,8 @@ export const paths = {
     rooms: '/dashboard/rooms',
     roomDone: '/dashboard/room_done',
     integrations: '/dashboard/integrations',
+    XacNhanPhong: '/dashboard/XacNhanPhong/',
+
     settings: '/dashboard/settings',
   },
   errors: { notFound: '/errors/not-found' },
